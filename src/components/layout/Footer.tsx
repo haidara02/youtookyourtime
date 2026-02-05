@@ -21,7 +21,7 @@ export default function Footer() {
           <p className="text-xs">
             ★ site created by{" "}
             <Link
-              href="https://ktng.vercel.app/"
+              href="https://www.khoinguyen.work/"
               target="_blank"
               rel="noopener noreferrer"
               className="underline hover:text-gray-900"
