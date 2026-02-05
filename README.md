@@ -1,5 +1,4 @@
 # You Took Your Time
-==================
 E-commerce Platform  for the You Took Your Time clothing brand
 
 ## Stack
