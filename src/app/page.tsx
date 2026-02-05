@@ -5,7 +5,7 @@ export default function HomePage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Hero */}
       <section className="mb-16">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="relative aspect-square bg-gray-100">
             {/* Placeholder */}
             <div className="flex h-full items-center justify-center text-gray-400">

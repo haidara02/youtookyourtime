@@ -4,9 +4,12 @@ import CartIcon from "../ui/CartIcon";
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background">
-      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ">
+      <nav className="mx-auto px-4 sm:px-6 lg:px-8 md:py-5 ">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="text-xl font-bold tracking-tight">
+          <Link
+            href="/"
+            className="text-xl lg:text-5xl font-bold tracking-tight"
+          >
             You Took Your Time
           </Link>
 
