@@ -10,7 +10,7 @@ export default function Header() {
             href="/"
             className="text-xl lg:text-5xl font-bold tracking-tight"
           >
-            You Took Your Time
+            YOU TOOK YOUR TIME
           </Link>
 
           <div className="flex flex-col items-end gap-2">
