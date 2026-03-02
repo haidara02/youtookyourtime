@@ -8,8 +8,6 @@ import {
 import path from "path";
 import { fileURLToPath } from "url";
 
-// import { adminOnly } from '@/access/adminOnly'
-
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 

@@ -1,18 +1,30 @@
-export default function ShopPage() {
+import configPromise from "@payload-config";
+import { getPayload } from "payload";
+import { ProductGridItem } from "@/components/ProductGridItem";
+
+export default async function ShopPage() {
+  const payload = await getPayload({ config: configPromise });
+  const products = await payload.find({
+    collection: "products",
+    draft: false,
+    sort: "title",
+    overrideAccess: false,
+    select: {
+      title: true,
+      slug: true,
+      gallery: true,
+      categories: true,
+      priceInVND: true,
+    },
+    // where: {
+    //   _status: { equals: "published" },
+    // },
+  });
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {/* TODO: Infinite Scroll*/}
-        {Array.from({ length: 24 }).map((_, i) => (
-          <div key={i} className="group">
-            <div className="relative aspect-square bg-gray-100 mb-2">
-              <div className="flex h-full items-center justify-center text-gray-400">
-                Product {i + 1}
-              </div>
-            </div>
-            <h3 className="text-sm font-medium">Product Name</h3>
-            <p className="text-sm text-gray-600">Out of stock</p>
-          </div>
+        {products.docs.map((product) => (
+          <ProductGridItem key={product.id} product={product} />
         ))}
       </div>
     </div>
