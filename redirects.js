@@ -1,5 +1,3 @@
-import type { Redirect } from "next/dist/lib/load-custom-routes";
-
 const redirects = async () => {
   const internetExplorerRedirect = {
     destination: "/ie-incompatible.html",
@@ -12,11 +10,11 @@ const redirects = async () => {
     ],
     permanent: false,
     source: "/:path((?!ie-incompatible.html$).*)", // all pages except the incompatibility page
-  } satisfies Redirect;
+  };
 
-  const redirectsList = [internetExplorerRedirect];
+  const redirects = [internetExplorerRedirect];
 
-  return redirectsList;
+  return redirects;
 };
 
 export default redirects;

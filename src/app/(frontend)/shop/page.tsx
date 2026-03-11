@@ -8,7 +8,7 @@ export default async function ShopPage() {
     collection: "products",
     draft: false,
     sort: "title",
-    overrideAccess: false,
+    // overrideAccess: false,
     select: {
       title: true,
       slug: true,
@@ -16,6 +16,7 @@ export default async function ShopPage() {
       categories: true,
       priceInVND: true,
     },
+    depth: 2,
     // where: {
     //   _status: { equals: "published" },
     // },

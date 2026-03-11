@@ -22,6 +22,12 @@ export const Media: CollectionConfig = {
   //   read: () => true,
   //   update: adminOnly,
   // },
+  access: {
+    create: () => true, // optional: allow uploads
+    read: () => true, // ✅ allow anyone to read media
+    update: () => false,
+    delete: () => false,
+  },
   fields: [
     {
       name: "alt",
