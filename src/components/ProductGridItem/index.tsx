@@ -1,8 +1,9 @@
+"use client";
+
 import type { Product } from "@/payload-types";
 
 import Link from "next/link";
-import React from "react";
-import clsx from "clsx";
+import React, { useState } from "react";
 import { Media } from "@/components/Media";
 
 type Props = {
@@ -11,34 +12,69 @@ type Props = {
 
 export const ProductGridItem: React.FC<Props> = ({ product }) => {
   const { gallery, priceInVND } = product;
+  const [isHovering, setIsHovering] = useState(false);
 
-  const image =
+  const firstImage =
     gallery?.[0]?.image && typeof gallery[0]?.image !== "string"
       ? gallery[0]?.image
-      : false;
+      : null;
+
+  const secondImage =
+    gallery?.[1]?.image && typeof gallery[1]?.image !== "string"
+      ? gallery[1]?.image
+      : null;
+
+  const hasSecondImage = !!secondImage;
+
   return (
     <Link
       className="relative inline-block h-full w-full group"
       href={`/products/${product.slug}`}
+      onMouseEnter={() => hasSecondImage && setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
     >
-      {image ? (
-        <Media
-          className={clsx(
-            "relative aspect-3/4 object-cover border rounded-2xl p-8 bg-primary-foreground",
-          )}
-          height={80}
-          imgClassName={clsx("h-full w-full object-cover rounded-2xl", {
-            "transition duration-300 ease-in-out group-hover:scale-102": true,
-          })}
-          resource={image}
-          width={80}
-        />
-      ) : null}
+      <div className="relative aspect-3/4 overflow-hidden">
+        {/* First image */}
+        {firstImage ? (
+          <div
+            className="absolute inset-0 transition-opacity duration-300 ease-in-out"
+            style={{
+              opacity: isHovering ? 0 : 1,
+            }}
+          >
+            <Media
+              className="relative aspect-3/4 object-cover"
+              height={80}
+              imgClassName="h-full w-full object-cover"
+              resource={firstImage}
+              width={80}
+            />
+          </div>
+        ) : null}
+
+        {/* Second image on hover */}
+        {secondImage ? (
+          <div
+            className="absolute inset-0 transition-opacity duration-200 ease-in-out"
+            style={{
+              opacity: isHovering ? 1 : 0,
+            }}
+          >
+            <Media
+              className="relative aspect-3/4 object-cover"
+              height={80}
+              imgClassName="h-full w-full object-cover"
+              resource={secondImage}
+              width={80}
+            />
+          </div>
+        ) : null}
+      </div>
 
       <div className="mt-3">
         <h3 className="text-sm font-medium">{product.title}</h3>
         <p className="text-sm text-muted-foreground">
-          {priceInVND?.toLocaleString("vi-VN")}₫
+          {product.inventory == 0 ? "Out of stock" : priceInVND?.toLocaleString("vi-VN") + "₫"}
         </p>
       </div>
     </Link>
