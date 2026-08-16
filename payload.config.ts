@@ -73,6 +73,12 @@ export default buildConfig({
     // DATABASE_MONGODB_URI is auto-injected by Vercel's MongoDB Atlas
     // integration in production; DATABASE_URL is used for local dev.
     url: process.env.DATABASE_MONGODB_URI || process.env.DATABASE_URL || "",
+    // Connection strings here don't specify a path segment, so Mongo
+    // defaults to a database literally named "test". Override via
+    // DATABASE_NAME where a real name is wanted (e.g. Vercel prod).
+    connectOptions: process.env.DATABASE_NAME
+      ? { dbName: process.env.DATABASE_NAME }
+      : undefined,
   }),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",
