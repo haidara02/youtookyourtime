@@ -70,7 +70,9 @@ export default buildConfig({
   // Define and configure your collections in this array
   collections: [Users, Pages, Categories, Media],
   db: mongooseAdapter({
-    url: process.env.DATABASE_URL || "",
+    // DATABASE_MONGODB_URI is auto-injected by Vercel's MongoDB Atlas
+    // integration in production; DATABASE_URL is used for local dev.
+    url: process.env.DATABASE_MONGODB_URI || process.env.DATABASE_URL || "",
   }),
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || "",
