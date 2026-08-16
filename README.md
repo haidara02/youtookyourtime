@@ -3,7 +3,7 @@ E-commerce Platform  for the You Took Your Time clothing brand
 
 ## Stack
 
-- **Framework:** Next.js 14 (App Router)
+- **Framework:** Next.js 16 (App Router) with Payload CMS 3
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Deployment:** Vercel
@@ -11,14 +11,14 @@ E-commerce Platform  for the You Took Your Time clothing brand
 
 ## Prerequisites & Setup
 
-- Node.js 18+ and npm
+- Node.js 18+ and pnpm
 
 First, install dependencies, copy environment variables and run the development server:
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env.local
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
