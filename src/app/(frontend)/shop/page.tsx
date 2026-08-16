@@ -11,27 +11,35 @@ export default function ShopPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   const fetchProducts = useCallback(async (pageNum: number) => {
     if (isLoading || !hasMore) return;
-    
+
     setIsLoading(true);
     try {
       const response = await fetch(
         `/api/products?page=${pageNum}&limit=${ITEMS_PER_PAGE}`
       );
-      const data = await response.json();
-      
-      if (pageNum === 1) {
-        setProducts(data.docs);
-      } else {
-        setProducts((prev) => [...prev, ...data.docs]);
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
       }
-      
+
+      const data = await response.json();
+
+      if (pageNum === 1) {
+        setProducts(data.docs ?? []);
+      } else {
+        setProducts((prev) => [...prev, ...(data.docs ?? [])]);
+      }
+
       setHasMore(data.page < data.totalPages);
     } catch (error) {
       console.error("Failed to fetch products:", error);
+      setLoadError(true);
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
@@ -90,6 +98,14 @@ export default function ShopPage() {
       {isLoading && (
         <div className="mt-8 flex justify-center">
           <div className="text-sm text-muted-foreground">Loading more products...</div>
+        </div>
+      )}
+
+      {loadError && (
+        <div className="mt-8 flex justify-center">
+          <div className="text-sm text-muted-foreground">
+            Couldn&apos;t load products right now. Please try again shortly.
+          </div>
         </div>
       )}
       

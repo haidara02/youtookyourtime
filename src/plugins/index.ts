@@ -8,6 +8,7 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { ecommercePlugin } from "@payloadcms/plugin-ecommerce";
+import { s3Storage } from "@payloadcms/storage-s3";
 
 // import { stripeAdapter } from "@payloadcms/plugin-ecommerce/payments/stripe";
 
@@ -136,4 +137,29 @@ export const plugins: Plugin[] = [
       productsCollectionOverride: ProductsCollection,
     },
   }),
+  // Cloudflare R2 (S3-compatible) media storage. Falls back to local disk
+  // (see the `upload.staticDir` in src/collections/Media.ts) until these
+  // env vars are set — see local/docs/INSTRUCTIONS.md for setup.
+  ...(process.env.S3_BUCKET &&
+  process.env.S3_ACCESS_KEY_ID &&
+  process.env.S3_SECRET_ACCESS_KEY &&
+  process.env.S3_ENDPOINT
+    ? [
+        s3Storage({
+          collections: {
+            media: true,
+          },
+          bucket: process.env.S3_BUCKET,
+          config: {
+            credentials: {
+              accessKeyId: process.env.S3_ACCESS_KEY_ID,
+              secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
+            },
+            endpoint: process.env.S3_ENDPOINT,
+            region: process.env.S3_REGION || "auto",
+            forcePathStyle: true,
+          },
+        }),
+      ]
+    : []),
 ];
