@@ -1,17 +1,18 @@
 import Link from "next/link";
 import CartIcon from "../ui/CartIcon";
+import CurrencySelector from "../ui/CurrencySelector";
 
 export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background text-black/80">
-      <nav className="mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5 ">
+      <nav className="mx-auto px-4 sm:px-6 lg:px-32 py-4 md:py-8 ">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:h-16">
           <Link href="/" className="text-5xl font-bold">
             YOU TOOK YOUR TIME <span className="text-brand-red">(VN)</span>
           </Link>
 
           <div className="flex flex-col items-start gap-2 md:items-end">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-bold">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-base font-bold">
               <Link
                 href="/"
                 className="hover:text-brand-red transition-colors"
@@ -43,7 +44,8 @@ export default function Header() {
                 CONTACT
               </Link>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
+              <CurrencySelector />
               <CartIcon count={0} />
             </div>
           </div>

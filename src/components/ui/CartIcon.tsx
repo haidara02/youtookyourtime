@@ -10,9 +10,9 @@ export default function CartIcon({ count }: CartIconProps) {
   return (
     <Link
       href="/cart"
-      className="text-xs font-bold hover:text-gray-600 transition-colors"
+      className="text-base font-bold hover:text-gray-600 transition-colors"
     >
-      cart ({count})
+      cart <span className="font-normal text-blue-600">({count})</span>
     </Link>
   );
 }
