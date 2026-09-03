@@ -130,9 +130,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     about: About;
+    home: Home;
   };
   globalsSelect: {
     about: AboutSelect<false> | AboutSelect<true>;
+    home: HomeSelect<false> | HomeSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1381,11 +1383,33 @@ export interface About {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home".
+ */
+export interface Home {
+  id: string;
+  heroVideo1?: (string | null) | Media;
+  heroVideo2?: (string | null) | Media;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about_select".
  */
 export interface AboutSelect<T extends boolean = true> {
   description?: T;
   image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "home_select".
+ */
+export interface HomeSelect<T extends boolean = true> {
+  heroVideo1?: T;
+  heroVideo2?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
