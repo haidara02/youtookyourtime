@@ -150,6 +150,12 @@ export const plugins: Plugin[] = [
             media: true,
           },
           bucket: process.env.S3_BUCKET,
+          // Vercel serverless functions cap request bodies at ~4.5MB, which
+          // routing uploads through the API would hit for anything but small
+          // images. This uploads straight from the browser to R2 via a
+          // presigned URL instead. Requires CORS (PUT) enabled on the bucket
+          // for the site's origin(s).
+          clientUploads: true,
           config: {
             credentials: {
               accessKeyId: process.env.S3_ACCESS_KEY_ID,
