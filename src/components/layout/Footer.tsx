@@ -30,6 +30,19 @@ export default function Footer() {
             </Link>{" "}
             ★
           </p>
+
+          <p className="text-xs">
+            ★ designed by{" "}
+            <Link
+              href="https://www.blueroomstudios.com.au/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-gray-900"
+            >
+              BLUEROOM Studios
+            </Link>{" "}
+            ★
+          </p>
         </div>
       </div>
     </footer>
