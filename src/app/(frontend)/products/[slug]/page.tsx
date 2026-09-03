@@ -9,6 +9,8 @@ type Args = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductPage({ params }: Args) {
   const { slug } = await params;
   const payload = await getPayload({ config: configPromise });

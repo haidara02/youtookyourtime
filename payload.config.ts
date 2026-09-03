@@ -20,6 +20,7 @@ import { Categories } from "@/collections/Categories";
 import { Media } from "@/collections/Media";
 import { Pages } from "@/collections/Pages";
 import { Users } from "@/collections/Users";
+import { About } from "@/globals/About";
 import { plugins } from "./src/plugins";
 
 const filename = fileURLToPath(import.meta.url);
@@ -69,6 +70,7 @@ export default buildConfig({
   }),
   // Define and configure your collections in this array
   collections: [Users, Pages, Categories, Media],
+  globals: [About],
   db: mongooseAdapter({
     // DATABASE_MONGODB_URI is auto-injected by Vercel's MongoDB Atlas
     // integration in production; DATABASE_URL is used for local dev.
