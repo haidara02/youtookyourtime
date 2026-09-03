@@ -3,6 +3,8 @@ import configPromise from "@payload-config";
 import { getPayload } from "payload";
 import { ProductGridItem } from "@/components/ProductGridItem";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise });
   const { docs: latestProducts } = await payload.find({

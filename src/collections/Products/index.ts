@@ -18,6 +18,10 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { DefaultDocumentIDType, slugField, Where } from "payload";
+import {
+  revalidateProduct,
+  revalidateProductDelete,
+} from "./hooks/revalidateProduct";
 
 export const ProductsCollection: CollectionOverride = ({
   defaultCollection,
@@ -234,4 +238,15 @@ export const ProductsCollection: CollectionOverride = ({
     },
     slugField(),
   ],
+  hooks: {
+    ...defaultCollection.hooks,
+    afterChange: [
+      ...(defaultCollection.hooks?.afterChange ?? []),
+      revalidateProduct,
+    ],
+    afterDelete: [
+      ...(defaultCollection.hooks?.afterDelete ?? []),
+      revalidateProductDelete,
+    ],
+  },
 });

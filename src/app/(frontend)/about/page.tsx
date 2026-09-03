@@ -1,4 +1,17 @@
-export default function AboutPage() {
+import configPromise from "@payload-config";
+import { getPayload } from "payload";
+import { RichText } from "@payloadcms/richtext-lexical/react";
+
+import { Media } from "@/components/Media";
+
+export default async function AboutPage() {
+  const payload = await getPayload({ config: configPromise });
+
+  const about = await payload.findGlobal({
+    slug: "about",
+    depth: 1,
+  });
+
   return (
     <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:max-w-9/10">
       <div className="grid gap-12 md:grid-cols-2">
@@ -12,23 +25,26 @@ export default function AboutPage() {
               ))}
             </div>
 
-            <p className="text-sm leading-relaxed">
-              You Took Your Time steps in the direction of circular fashion,
-              having all the materials sourced from second-hand stores that
-              supports Australian organised charities.
-            </p>
-
-            <p className="text-sm leading-relaxed">
-              You Took Your Time is based on the east coast of Australia and
-              aims to bring together and encourage creative people!
-            </p>
+            {about.description ? (
+              <div className="prose prose-sm text-sm leading-relaxed">
+                <RichText data={about.description} />
+              </div>
+            ) : null}
           </div>
         </div>
 
-        <div className="aspect-square bg-gray-100">
-          <div className="flex h-full items-center justify-center text-gray-400">
-            Image
-          </div>
+        <div className="relative aspect-square bg-gray-100">
+          {about.image && typeof about.image !== "string" ? (
+            <Media
+              resource={about.image}
+              imgClassName="h-full w-full object-cover"
+              fill
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-gray-400">
+              Image
+            </div>
+          )}
         </div>
       </div>
     </div>
