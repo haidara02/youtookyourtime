@@ -3,6 +3,7 @@
 import { ProductGridItem } from "@/components/ProductGridItem";
 import { useEffect, useRef, useCallback, useState } from "react";
 import type { Product } from "@/payload-types";
+import { fetchShopProducts } from "./fetchProducts";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -19,15 +20,7 @@ export default function ShopPage() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/api/products?page=${pageNum}&limit=${ITEMS_PER_PAGE}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await fetchShopProducts(pageNum, ITEMS_PER_PAGE);
 
       if (pageNum === 1) {
         setProducts(data.docs ?? []);
