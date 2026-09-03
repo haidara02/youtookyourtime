@@ -32,7 +32,7 @@ export default async function HomePage() {
   return (
     <div className="w-vw">
       {/* Hero */}
-      <section className="relative mb-16 px-4 py-12 sm:px-6 lg:px-8 vh-[80vh] w-full">
+      <section className="relative mb-16 h-[calc(100svh-var(--header-height))] w-full px-4 py-12 sm:px-6 lg:px-8 overflow-hidden">
         <Image
           src="/images/hero-bg.png"
           alt="You Took Your Time hero image"
@@ -40,8 +40,8 @@ export default async function HomePage() {
           priority
           className="object-cover"
         />
-        <div className="relative flex flex-col md:flex-row gap-30 justify-center items-center">
-          <div className="relative aspect-9/16 h-150 bg-neutral-100">
+        <div className="relative flex h-full flex-col items-center justify-center gap-4 md:flex-row md:gap-30">
+          <div className="relative aspect-9/16 max-h-full flex-1 bg-neutral-100 md:h-full md:flex-none">
             {home.heroVideo1 && typeof home.heroVideo1 !== "string" ? (
               <Media
                 resource={home.heroVideo1}
@@ -54,7 +54,7 @@ export default async function HomePage() {
               </div>
             )}
           </div>
-          <div className="relative aspect-9/16 h-150 bg-neutral-100">
+          <div className="relative aspect-9/16 max-h-full flex-1 bg-neutral-100 md:h-full md:flex-none">
             {home.heroVideo2 && typeof home.heroVideo2 !== "string" ? (
               <Media
                 resource={home.heroVideo2}

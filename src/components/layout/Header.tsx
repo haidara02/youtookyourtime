@@ -1,10 +1,37 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import CartIcon from "../ui/CartIcon";
 import CurrencySelector from "../ui/CurrencySelector";
 
 export default function Header() {
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const setHeaderHeight = () => {
+      document.documentElement.style.setProperty(
+        "--header-height",
+        `${header.offsetHeight}px`,
+      );
+    };
+
+    setHeaderHeight();
+
+    const resizeObserver = new ResizeObserver(setHeaderHeight);
+    resizeObserver.observe(header);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 bg-background text-black/80">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-50 bg-background text-black/80"
+    >
       <nav className="mx-auto px-4 sm:px-6 lg:px-32 py-4 md:py-8 ">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between md:h-16">
           <Link href="/" className="text-5xl font-bold">
