@@ -8,8 +8,8 @@ import CurrencySelector from "../ui/CurrencySelector";
 import { cn } from "@/utilities/cn";
 
 const NAV_LINKS = [
-  { href: "/", label: "HOME" },
   { href: "/shop", label: "SHOP" },
+  { href: "/stockist", label: "STOCK" },
   { href: "/about", label: "ABOUT" },
   { href: "/blog", label: "BLOG" },
   { href: "/contact", label: "CONTACT" },
