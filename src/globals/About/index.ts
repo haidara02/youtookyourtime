@@ -9,6 +9,7 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 
+import { previewURL } from "@/utilities/generatePreviewPath";
 import { revalidateAbout } from "./hooks/revalidateAbout";
 
 export const About: GlobalConfig = {
@@ -19,6 +20,12 @@ export const About: GlobalConfig = {
   },
   admin: {
     group: "Content",
+    livePreview: { url: () => previewURL("/about") },
+    preview: () => previewURL("/about"),
+  },
+  // Edits are saved as drafts (shown in Live Preview) until "Publish".
+  versions: {
+    drafts: { autosave: { interval: 375 } },
   },
   fields: [
     {

@@ -1,3 +1,4 @@
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
@@ -5,6 +6,7 @@ import { getPayload } from "payload";
 import { Media } from "@/components/Media";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { RichText } from "@/components/RichText";
+import { RefreshRouteOnSave } from "@/components/LivePreview/RefreshRouteOnSave";
 
 type Args = {
   params: Promise<{ slug: string }>;
@@ -15,17 +17,21 @@ export const dynamic = "force-dynamic";
 export default async function ProductPage({ params }: Args) {
   const { slug } = await params;
   const payload = await getPayload({ config: configPromise });
+  // On only for admins previewing (see /next/preview): show the latest draft.
+  const { isEnabled: draft } = await draftMode();
 
   const { docs } = await payload.find({
     collection: "products",
-    draft: false,
+    draft,
     limit: 1,
     depth: 2,
-    where: {
-      slug: { equals: slug },
-      // Local API skips access control, so filter drafts out explicitly.
-      _status: { equals: "published" },
-    },
+    where: draft
+      ? { slug: { equals: slug } }
+      : {
+          slug: { equals: slug },
+          // Local API skips access control, so filter drafts out explicitly.
+          _status: { equals: "published" },
+        },
   });
 
   const product = docs[0];
@@ -38,6 +44,7 @@ export default async function ProductPage({ params }: Args) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      {draft ? <RefreshRouteOnSave /> : null}
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="grid grid-cols-2 gap-2">
           {gallery?.map((item) =>

@@ -6,7 +6,9 @@ export const revalidateAbout: GlobalAfterChangeHook = ({
   doc,
   req: { payload, context },
 }) => {
-  if (!context.disableRevalidate) {
+  // Skip draft saves/autosaves (Live Preview); only publishing changes the
+  // public page.
+  if (!context.disableRevalidate && doc._status !== "draft") {
     payload.logger.info("Revalidating about page");
 
     revalidatePath("/about");

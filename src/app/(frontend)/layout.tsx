@@ -5,6 +5,8 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Ecommerce } from "@/providers/Ecommerce";
+import { PreviewBanner } from "@/components/LivePreview/PreviewBanner";
+import { draftMode } from "next/headers";
 
 const alteHaasGrotesk = localFont({
   src: [
@@ -35,17 +37,20 @@ export const metadata: Metadata = {
   ),
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isEnabled: previewingDrafts } = await draftMode();
+
   return (
     <html lang="en">
       <body
         className={`${alteHaasGrotesk.variable} ${geistMono.variable} antialiased`}
       >
         <Ecommerce>
+          {previewingDrafts ? <PreviewBanner /> : null}
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>

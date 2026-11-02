@@ -55,6 +55,14 @@ export const ProductsCollection: CollectionOverride = ({
     inventory: true,
     meta: true,
   },
+  // Drafts + autosave come from the plugin; a short interval keeps the Live
+  // Preview pane in step with typing (it refreshes on every autosave).
+  versions: {
+    ...(typeof defaultCollection.versions === "object"
+      ? defaultCollection.versions
+      : {}),
+    drafts: { autosave: { interval: 375 } },
+  },
   // Access comes from the ecommerce plugin's defaults via `...defaultCollection`:
   // create/update/delete are admin-only, read is admin or `_status: published`.
   // (Frontend pages use the Local API, which bypasses access control.)

@@ -28,7 +28,11 @@ export const revalidateProduct: CollectionAfterChangeHook<Product> = ({
   previousDoc,
   req: { payload, context },
 }) => {
-  if (!context.disableRevalidate) {
+  // Draft saves/autosaves (Live Preview) don't change the public site; only
+  // publishing or unpublishing does.
+  const publishedChanged =
+    doc._status === "published" || previousDoc?._status === "published";
+  if (!context.disableRevalidate && publishedChanged) {
     revalidateProductPaths([doc.slug, previousDoc?.slug], payload);
   }
 

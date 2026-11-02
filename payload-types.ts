@@ -1258,6 +1258,7 @@ export interface About {
     [k: string]: unknown;
   };
   image: string | Media;
+  _status?: ('draft' | 'published') | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1316,6 +1317,7 @@ export interface ShopSetting {
 export interface AboutSelect<T extends boolean = true> {
   description?: T;
   image?: T;
+  _status?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
