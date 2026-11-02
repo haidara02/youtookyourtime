@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "generate:importmap": "payload generate:importmap"
+    "generate:importmap": "payload generate:importmap",
+    "db:start": "mkdir -p local/mongo-data && mongod --dbpath local/mongo-data --bind_ip 127.0.0.1 --port 27017 --fork --logpath local/mongo-data/mongod.log",
+    "db:stop": "mongod --dbpath local/mongo-data --shutdown",
+    "db:pull": "bash scripts/pull-prod-db.sh"
   },
   "dependencies": {
     "@payloadcms/db-mongodb": "^3.92.1",
