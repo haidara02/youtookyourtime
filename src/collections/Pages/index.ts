@@ -4,7 +4,7 @@ import type { CollectionConfig } from "payload";
 // import { Carousel } from "@/blocks/Carousel/config";
 // import { ThreeItemGrid } from "@/blocks/ThreeItemGrid/config";
 import { generatePreviewPath } from "@/utilities/generatePreviewPath";
-// import { adminOnly } from "@/access/adminOnly";
+import { adminOnly } from "@/access/adminOnly";
 // import { Archive } from "@/blocks/ArchiveBlock/config";
 // import { CallToAction } from "@/blocks/CallToAction/config";
 // import { Content } from "@/blocks/Content/config";
@@ -12,7 +12,7 @@ import { generatePreviewPath } from "@/utilities/generatePreviewPath";
 // import { MediaBlock } from "@/blocks/MediaBlock/config";
 // import { hero } from "@/fields/hero";
 import { slugField } from "payload";
-// import { adminOrPublishedStatus } from "@/access/adminOrPublishedStatus";
+import { adminOrPublishedStatus } from "@/access/adminOrPublishedStatus";
 import {
   MetaDescriptionField,
   MetaImageField,
@@ -24,12 +24,12 @@ import { revalidatePage, revalidateDelete } from "./hooks/revalidatePage";
 
 export const Pages: CollectionConfig = {
   slug: "pages",
-  // access: {
-  //   create: adminOnly,
-  //   delete: adminOnly,
-  //   read: adminOrPublishedStatus,
-  //   update: adminOnly,
-  // },
+  access: {
+    create: adminOnly,
+    delete: adminOnly,
+    read: adminOrPublishedStatus,
+    update: adminOnly,
+  },
   admin: {
     // group: "Content",
     // defaultColumns: ["title", "slug", "updatedAt"],

@@ -5,6 +5,7 @@ import type { Product } from "@/payload-types";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Media } from "@/components/Media";
+import { formatVND } from "@/utilities/formatPrice";
 
 type Props = {
   product: Partial<Product>;
@@ -74,7 +75,7 @@ export const ProductGridItem: React.FC<Props> = ({ product }) => {
       <div className="mt-3">
         <h3 className="text-sm font-medium">{product.title}</h3>
         <p className="text-sm text-muted-foreground">
-          {product.inventory == 0 ? "Out of stock" : priceInVND?.toLocaleString("vi-VN") + "₫"}
+          {product.inventory == 0 ? "Out of stock" : formatVND(priceInVND)}
         </p>
       </div>
     </Link>

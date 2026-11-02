@@ -4,6 +4,7 @@ import { getPayload } from "payload";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 
 import { Media } from "@/components/Media";
+import { formatVND } from "@/utilities/formatPrice";
 
 type Args = {
   params: Promise<{ slug: string }>;
@@ -57,9 +58,7 @@ export default async function ProductPage({ params }: Args) {
         <div>
           <h1 className="text-2xl font-medium">{title}</h1>
           <p className="mt-2 text-lg text-muted-foreground">
-            {outOfStock
-              ? "Out of stock"
-              : `${priceInVND.toLocaleString("vi-VN")}₫`}
+            {outOfStock ? "Out of stock" : formatVND(priceInVND)}
           </p>
           {description ? (
             <div className="prose mt-6 max-w-none">
