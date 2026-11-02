@@ -25,6 +25,15 @@ export default function Header() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Close the mobile menu after navigating. Done during render (React's
+  // "adjust state when a prop changes" pattern) rather than in an effect,
+  // which would render the open menu once more before closing it.
+  const [menuPathname, setMenuPathname] = useState(pathname);
+  if (menuPathname !== pathname) {
+    setMenuPathname(pathname);
+    setIsMenuOpen(false);
+  }
+
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
@@ -43,10 +52,6 @@ export default function Header() {
 
     return () => resizeObserver.disconnect();
   }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     if (!isMenuOpen) return;

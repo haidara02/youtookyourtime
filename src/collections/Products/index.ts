@@ -112,13 +112,13 @@ export const ProductsCollection: CollectionOverride = ({
                   },
                   filterOptions: ({ data }) => {
                     if (data?.enableVariants && data?.variantTypes?.length) {
+                      // Populated docs or bare IDs, depending on depth.
                       const variantTypeIDs = data.variantTypes.map(
-                        (item: any) => {
-                          if (typeof item === "object" && item?.id) {
-                            return item.id;
-                          }
-                          return item;
-                        },
+                        (
+                          item:
+                            | DefaultDocumentIDType
+                            | { id: DefaultDocumentIDType },
+                        ) => (typeof item === "object" ? item.id : item),
                       ) as DefaultDocumentIDType[];
 
                       if (variantTypeIDs.length === 0)

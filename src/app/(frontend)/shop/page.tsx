@@ -1,119 +1,32 @@
-"use client";
-
-import { ProductGridItem } from "@/components/ProductGridItem";
-import { useEffect, useRef, useCallback, useState } from "react";
 import type { Product } from "@/payload-types";
 import { fetchShopProducts } from "./fetchProducts";
+import { ShopGrid } from "./ShopGrid";
+
+export const dynamic = "force-dynamic";
 
 const ITEMS_PER_PAGE = 12;
 
-export default function ShopPage() {
-  const [products, setProducts] = useState<Partial<Product>[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loadError, setLoadError] = useState(false);
-  const observerTarget = useRef<HTMLDivElement>(null);
+export default async function ShopPage() {
+  // First page is rendered on the server; ShopGrid loads the rest on scroll.
+  let initialProducts: Partial<Product>[] = [];
+  let initialHasMore = false;
+  let initialLoadError = false;
 
-  const fetchProducts = useCallback(async (pageNum: number) => {
-    if (isLoading || !hasMore) return;
-
-    setIsLoading(true);
-    try {
-      const data = await fetchShopProducts(pageNum, ITEMS_PER_PAGE);
-
-      if (pageNum === 1) {
-        setProducts(data.docs ?? []);
-      } else {
-        setProducts((prev) => [...prev, ...(data.docs ?? [])]);
-      }
-
-      setHasMore(data.page < data.totalPages);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-      setLoadError(true);
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [isLoading, hasMore]);
-
-  // Initial load
-  useEffect(() => {
-    fetchProducts(1);
-  }, []);
-
-  // Infinite scroll observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          setPage((prev) => prev + 1);
-          fetchProducts(page + 1);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => observer.disconnect();
-  }, [hasMore, isLoading, page, fetchProducts]);
+  try {
+    const data = await fetchShopProducts(1, ITEMS_PER_PAGE);
+    initialProducts = data.docs;
+    initialHasMore = data.page < data.totalPages;
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    initialLoadError = true;
+  }
 
   return (
-    <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product, index) => {
-          // Add fade-in animation with staggered delay for new rows
-          const delay = Math.floor(index / 3) * 150;
-          return (
-            <div
-              key={product.id}
-              style={{
-                animation: `fadeIn 0.6s ease-in-out ${delay}ms both`,
-              }}
-            >
-              <ProductGridItem product={product} />
-            </div>
-          );
-        })}
-      </div>
-      
-      {/* Infinite scroll trigger */}
-      <div
-        ref={observerTarget}
-        className="mt-12 h-4"
-        aria-hidden="true"
-      />
-      
-      {isLoading && (
-        <div className="mt-8 flex justify-center">
-          <div className="text-sm text-muted-foreground">Loading more products...</div>
-        </div>
-      )}
-
-      {loadError && (
-        <div className="mt-8 flex justify-center">
-          <div className="text-sm text-muted-foreground">
-            Couldn&apos;t load products right now. Please try again shortly.
-          </div>
-        </div>
-      )}
-      
-      <style>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
-    </div>
+    <ShopGrid
+      initialProducts={initialProducts}
+      initialHasMore={initialHasMore}
+      initialLoadError={initialLoadError}
+      pageSize={ITEMS_PER_PAGE}
+    />
   );
 }
