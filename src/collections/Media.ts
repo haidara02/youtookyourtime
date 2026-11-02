@@ -44,6 +44,20 @@ export const Media: CollectionConfig = {
         },
       }),
     },
+    {
+      // Still frame shown while a video loads (and if autoplay is blocked,
+      // e.g. iOS Low Power Mode).
+      name: "poster",
+      type: "upload",
+      relationTo: "media",
+      filterOptions: {
+        mimeType: { contains: "image" },
+      },
+      admin: {
+        condition: (data) => Boolean(data?.mimeType?.includes("video")),
+        description: "Image shown while the video loads.",
+      },
+    },
   ],
   upload: {
     staticDir: path.resolve(dirname, "../../public/media"),

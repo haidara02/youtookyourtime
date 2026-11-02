@@ -342,6 +342,10 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Image shown while the video loads.
+   */
+  poster?: (string | null) | Media;
   _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -935,6 +939,7 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  poster?: T;
   _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;

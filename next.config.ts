@@ -8,14 +8,17 @@ const nextConfig = {
   images: {
     dangerouslyAllowLocalIP: true,
     remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL].map((item) => {
-        const url = new URL(item);
+      // S3_PUBLIC_URL: public R2 media domain (see src/plugins/index.ts).
+      ...[NEXT_PUBLIC_SERVER_URL, process.env.S3_PUBLIC_URL]
+        .filter((item): item is string => Boolean(item))
+        .map((item) => {
+          const url = new URL(item);
 
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(":", "") as "http" | "https",
-        };
-      }),
+          return {
+            hostname: url.hostname,
+            protocol: url.protocol.replace(":", "") as "http" | "https",
+          };
+        }),
     ],
   },
 };
