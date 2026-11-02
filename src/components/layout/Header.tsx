@@ -94,7 +94,7 @@ export default function Header() {
             </div>
             <div className="flex items-center gap-4">
               <CurrencySelector />
-              <CartIcon count={0} />
+              <CartIcon />
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export default function Header() {
 
         <div className="mt-4 flex items-center gap-4 md:hidden">
           <CurrencySelector />
-          <CartIcon count={0} />
+          <CartIcon />
         </div>
 
         <div

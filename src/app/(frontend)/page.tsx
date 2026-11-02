@@ -13,6 +13,8 @@ export default async function HomePage() {
       collection: "products",
       draft: false,
       sort: "-createdAt",
+      // Local API skips access control, so filter drafts out explicitly.
+      where: { _status: { equals: "published" } },
       limit: 3,
       select: {
         title: true,

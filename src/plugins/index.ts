@@ -8,13 +8,13 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import { ecommercePlugin } from "@payloadcms/plugin-ecommerce";
-import type { Currency } from "@payloadcms/plugin-ecommerce/types";
 import { s3Storage } from "@payloadcms/storage-s3";
 
 // import { stripeAdapter } from "@payloadcms/plugin-ecommerce/payments/stripe";
 
 import { Page, Product } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
+import { currenciesConfig } from "@/utilities/currencies";
 import { ProductsCollection } from "@/collections/Products";
 import { adminOrPublishedStatus } from "@/access/adminOrPublishedStatus";
 import { adminOnlyFieldAccess } from "@/access/adminOnlyFieldAccess";
@@ -32,16 +32,6 @@ const generateURL: GenerateURL<Product | Page> = ({ doc }) => {
   const url = getServerSideURL();
 
   return doc?.slug ? `${url}/${doc.slug}` : url;
-};
-
-// VND has no minor unit, so prices are stored as whole dong (decimals: 0).
-// Leaving this at the plugin's USD-style default of 2 would make every
-// amount sent to a payment provider off by 100x.
-export const VND: Currency = {
-  code: "VND",
-  decimals: 0,
-  label: "Vietnamese Dong",
-  symbol: "₫",
 };
 
 export const plugins: Plugin[] = [
@@ -104,10 +94,8 @@ export const plugins: Plugin[] = [
       isAdmin,
       isDocumentOwner,
     },
-    currencies: {
-      defaultCurrency: VND.code,
-      supportedCurrencies: [VND],
-    },
+    // VND only — see src/utilities/currencies.ts
+    currencies: currenciesConfig,
     customers: {
       slug: "users",
     },

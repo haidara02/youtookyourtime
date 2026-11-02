@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useCart } from "@payloadcms/plugin-ecommerce/client/react";
 
-interface CartIconProps {
-  count: number;
-}
+export default function CartIcon() {
+  const { cart } = useCart();
+  const count =
+    cart?.items?.reduce((total, item) => total + (item.quantity ?? 0), 0) ?? 0;
 
-export default function CartIcon({ count }: CartIconProps) {
   return (
     <Link
       href="/cart"
