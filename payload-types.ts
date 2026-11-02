@@ -210,6 +210,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -254,7 +255,7 @@ export interface Order {
   transactions?: (string | Transaction)[] | null;
   status?: OrderStatus;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'VND' | null;
   accessToken?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -297,12 +298,8 @@ export interface Product {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
-  /**
-   * Product price in Vietnamese Dong
-   */
-  priceInVND: number;
+  priceInVNDEnabled?: boolean | null;
+  priceInVND?: number | null;
   relatedProducts?: (string | Product)[] | null;
   meta?: {
     title?: string | null;
@@ -345,6 +342,11 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Image shown while the video loads.
+   */
+  poster?: (string | null) | Media;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -414,8 +416,8 @@ export interface Variant {
   product: string | Product;
   options: (string | VariantOption)[];
   inventory?: number | null;
-  priceInUSDEnabled?: boolean | null;
-  priceInUSD?: number | null;
+  priceInVNDEnabled?: boolean | null;
+  priceInVND?: number | null;
   updatedAt: string;
   createdAt: string;
   deletedAt?: string | null;
@@ -463,13 +465,13 @@ export interface Transaction {
     country?: string | null;
     phone?: string | null;
   };
-  status: 'pending' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
+  status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled' | 'expired' | 'refunded';
   customer?: (string | null) | User;
   customerEmail?: string | null;
   order?: (string | null) | Order;
   cart?: (string | null) | Cart;
   amount?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'VND' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -492,7 +494,7 @@ export interface Cart {
   purchasedAt?: string | null;
   status?: ('active' | 'purchased' | 'abandoned') | null;
   subtotal?: number | null;
-  currency?: 'USD' | null;
+  currency?: 'VND' | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -691,9 +693,6 @@ export interface Form {
       )[]
     | null;
   submitButtonLabel?: string | null;
-  /**
-   * Choose whether to display an on-page message or redirect to a different page after they submit the form.
-   */
   confirmationType?: ('message' | 'redirect') | null;
   confirmationMessage?: {
     root: {
@@ -713,9 +712,6 @@ export interface Form {
   redirect?: {
     url: string;
   };
-  /**
-   * Send custom emails when the form submits. Use comma separated lists to send the same email to multiple recipients. To reference a value from this form, wrap that field's name with double curly brackets, i.e. {{firstName}}. You can use a wildcard {{*}} to output all data and {{*:table}} to format it as an HTML table in the email.
-   */
   emails?:
     | {
         emailTo?: string | null;
@@ -724,9 +720,6 @@ export interface Form {
         replyTo?: string | null;
         emailFrom?: string | null;
         subject: string;
-        /**
-         * Enter the message that should be sent in this email.
-         */
         message?: {
           root: {
             type: string;
@@ -904,6 +897,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -945,6 +939,8 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  poster?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1135,8 +1131,8 @@ export interface VariantsSelect<T extends boolean = true> {
   product?: T;
   options?: T;
   inventory?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInVNDEnabled?: T;
+  priceInVND?: T;
   updatedAt?: T;
   createdAt?: T;
   deletedAt?: T;
@@ -1190,8 +1186,7 @@ export interface ProductsSelect<T extends boolean = true> {
   enableVariants?: T;
   variantTypes?: T;
   variants?: T;
-  priceInUSDEnabled?: T;
-  priceInUSD?: T;
+  priceInVNDEnabled?: T;
   priceInVND?: T;
   relatedProducts?: T;
   meta?:

@@ -1,5 +1,8 @@
 import type { GlobalConfig } from "payload";
 
+import { adminOnly } from "@/access/adminOnly";
+import { publicAccess } from "@/access/publicAccess";
+
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -10,6 +13,10 @@ import { revalidateAbout } from "./hooks/revalidateAbout";
 
 export const About: GlobalConfig = {
   slug: "about",
+  access: {
+    read: publicAccess,
+    update: adminOnly,
+  },
   admin: {
     group: "Content",
   },

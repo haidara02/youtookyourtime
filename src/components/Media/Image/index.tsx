@@ -3,6 +3,7 @@
 import type { StaticImageData } from "next/image";
 
 import { cn } from "@/utilities/cn";
+import { resolveMediaURL } from "@/utilities/getMediaURL";
 import NextImage from "next/image";
 import React from "react";
 
@@ -33,7 +34,6 @@ export const Image: React.FC<MediaProps> = (props) => {
   let height: number | undefined | null;
   let alt = altFromProps;
   let src: StaticImageData | string = srcFromProps || "";
-  console.log(src);
 
   if (!src && resource && typeof resource === "object") {
     const {
@@ -47,11 +47,10 @@ export const Image: React.FC<MediaProps> = (props) => {
     width = widthFromProps ?? fullWidth;
     height = heightFromProps ?? fullHeight;
     alt = altFromResource;
-    console.log(url);
 
     const filename = fullFilename;
 
-    src = `${process.env.NEXT_PUBLIC_SERVER_URL}${url}`;
+    src = resolveMediaURL(url);
   }
 
   // NOTE: this is used by the browser to determine which image to download at different screen sizes

@@ -10,6 +10,8 @@ export async function fetchShopProducts(page: number, limit: number) {
     collection: "products",
     draft: false,
     sort: "title",
+    // Local API skips access control, so filter drafts out explicitly.
+    where: { _status: { equals: "published" } },
     page,
     limit,
     select: {

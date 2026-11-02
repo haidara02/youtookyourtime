@@ -14,6 +14,8 @@ import { s3Storage } from "@payloadcms/storage-s3";
 
 import { Page, Product } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
+import { getMediaPublicURL } from "@/utilities/getMediaURL";
+import { currenciesConfig } from "@/utilities/currencies";
 import { ProductsCollection } from "@/collections/Products";
 import { adminOrPublishedStatus } from "@/access/adminOrPublishedStatus";
 import { adminOnlyFieldAccess } from "@/access/adminOnlyFieldAccess";
@@ -93,6 +95,8 @@ export const plugins: Plugin[] = [
       isAdmin,
       isDocumentOwner,
     },
+    // VND only — see src/utilities/currencies.ts
+    currencies: currenciesConfig,
     customers: {
       slug: "users",
     },
@@ -147,7 +151,18 @@ export const plugins: Plugin[] = [
     ? [
         s3Storage({
           collections: {
-            media: true,
+            // With S3_PUBLIC_URL set (a public custom domain on the bucket,
+            // e.g. https://media.youtookyourtime.com), browsers fetch media
+            // straight from R2. Otherwise files are proxied through Payload's
+            // /api/media/file route, which streams every byte through a Vercel
+            // function and counts against Fast Origin Transfer.
+            media: process.env.S3_PUBLIC_URL
+              ? {
+                  disablePayloadAccessControl: true,
+                  generateFileURL: ({ filename, prefix }) =>
+                    getMediaPublicURL(filename, prefix),
+                }
+              : true,
           },
           bucket: process.env.S3_BUCKET,
           // Vercel serverless functions cap request bodies at ~4.5MB, which

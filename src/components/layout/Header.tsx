@@ -8,8 +8,8 @@ import CurrencySelector from "../ui/CurrencySelector";
 import { cn } from "@/utilities/cn";
 
 const NAV_LINKS = [
-  { href: "/", label: "HOME" },
   { href: "/shop", label: "SHOP" },
+  { href: "/stockist", label: "STOCK" },
   { href: "/about", label: "ABOUT" },
   { href: "/blog", label: "BLOG" },
   { href: "/contact", label: "CONTACT" },
@@ -24,6 +24,15 @@ export default function Header() {
   const headerRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  // Close the mobile menu after navigating. Done during render (React's
+  // "adjust state when a prop changes" pattern) rather than in an effect,
+  // which would render the open menu once more before closing it.
+  const [menuPathname, setMenuPathname] = useState(pathname);
+  if (menuPathname !== pathname) {
+    setMenuPathname(pathname);
+    setIsMenuOpen(false);
+  }
 
   useEffect(() => {
     const header = headerRef.current;
@@ -43,10 +52,6 @@ export default function Header() {
 
     return () => resizeObserver.disconnect();
   }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
 
   useEffect(() => {
     if (!isMenuOpen) return;
@@ -94,7 +99,7 @@ export default function Header() {
             </div>
             <div className="flex items-center gap-4">
               <CurrencySelector />
-              <CartIcon count={0} />
+              <CartIcon />
             </div>
           </div>
 
@@ -134,7 +139,7 @@ export default function Header() {
 
         <div className="mt-4 flex items-center gap-4 md:hidden">
           <CurrencySelector />
-          <CartIcon count={0} />
+          <CartIcon />
         </div>
 
         <div

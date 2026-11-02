@@ -58,12 +58,9 @@ export const ProductsCollection: CollectionOverride = ({
     inventory: true,
     meta: true,
   },
-  access: {
-    create: ({ req }) => true, // allow anyone to create for now
-    read: ({ req }) => true, // allow everyone to read
-    update: ({ req }) => true,
-    delete: ({ req }) => true,
-  },
+  // Access comes from the ecommerce plugin's defaults via `...defaultCollection`:
+  // create/update/delete are admin-only, read is admin or `_status: published`.
+  // (Frontend pages use the Local API, which bypasses access control.)
   fields: [
     { name: "title", type: "text", required: true },
     {
@@ -115,13 +112,13 @@ export const ProductsCollection: CollectionOverride = ({
                   },
                   filterOptions: ({ data }) => {
                     if (data?.enableVariants && data?.variantTypes?.length) {
+                      // Populated docs or bare IDs, depending on depth.
                       const variantTypeIDs = data.variantTypes.map(
-                        (item: any) => {
-                          if (typeof item === "object" && item?.id) {
-                            return item.id;
-                          }
-                          return item;
-                        },
+                        (
+                          item:
+                            | DefaultDocumentIDType
+                            | { id: DefaultDocumentIDType },
+                        ) => (typeof item === "object" ? item.id : item),
                       ) as DefaultDocumentIDType[];
 
                       if (variantTypeIDs.length === 0)
@@ -161,17 +158,10 @@ export const ProductsCollection: CollectionOverride = ({
         },
         {
           fields: [
+            // Includes inventory, variants, and the plugin's price fields
+            // (`priceInVND` + `priceInVNDEnabled`, from the `currencies`
+            // config in src/plugins/index.ts).
             ...defaultCollection.fields,
-            {
-              name: "priceInVND",
-              type: "number",
-              required: true,
-              admin: {
-                step: 1000, // increments for VND
-                description: "Product price in Vietnamese Dong",
-                label: "Price (VND)",
-              },
-            },
             {
               name: "relatedProducts",
               type: "relationship",

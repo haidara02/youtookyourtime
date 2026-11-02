@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/utilities/cn";
+import { resolveMediaURL } from "@/utilities/getMediaURL";
 import React, { useEffect, useRef } from "react";
 
 import type { Props as MediaProps } from "../types";
@@ -22,7 +23,10 @@ export const Video: React.FC<MediaProps> = (props) => {
   }, []);
 
   if (resource && typeof resource === "object") {
-    const { url } = resource;
+    const { mimeType, poster, url } = resource;
+    // Only populated when the doc was fetched with enough depth.
+    const posterURL =
+      poster && typeof poster === "object" ? resolveMediaURL(poster.url) : "";
 
     return (
       <video
@@ -33,9 +37,10 @@ export const Video: React.FC<MediaProps> = (props) => {
         muted
         onClick={onClick}
         playsInline
+        poster={posterURL || undefined}
         ref={videoRef}
       >
-        <source src={`${process.env.NEXT_PUBLIC_SERVER_URL}${url}`} />
+        <source src={resolveMediaURL(url)} type={mimeType || undefined} />
       </video>
     );
   }

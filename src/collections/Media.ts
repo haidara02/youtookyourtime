@@ -6,6 +6,9 @@ import {
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
 import path from "path";
+
+import { adminOnly } from "@/access/adminOnly";
+import { publicAccess } from "@/access/publicAccess";
 import { fileURLToPath } from "url";
 
 const filename = fileURLToPath(import.meta.url);
@@ -16,17 +19,11 @@ export const Media: CollectionConfig = {
     group: "Content",
   },
   slug: "media",
-  // access: {
-  //   create: adminOnly,
-  //   delete: adminOnly,
-  //   read: () => true,
-  //   update: adminOnly,
-  // },
   access: {
-    create: () => true, // optional: allow uploads
-    read: () => true, // ✅ allow anyone to read media
-    update: () => false,
-    delete: () => false,
+    create: adminOnly,
+    delete: adminOnly,
+    read: publicAccess,
+    update: adminOnly,
   },
   fields: [
     {
@@ -46,6 +43,20 @@ export const Media: CollectionConfig = {
           ];
         },
       }),
+    },
+    {
+      // Still frame shown while a video loads (and if autoplay is blocked,
+      // e.g. iOS Low Power Mode).
+      name: "poster",
+      type: "upload",
+      relationTo: "media",
+      filterOptions: {
+        mimeType: { contains: "image" },
+      },
+      admin: {
+        condition: (data) => Boolean(data?.mimeType?.includes("video")),
+        description: "Image shown while the video loads.",
+      },
     },
   ],
   upload: {

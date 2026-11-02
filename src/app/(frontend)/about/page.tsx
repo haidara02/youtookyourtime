@@ -14,9 +14,9 @@ export default async function AboutPage() {
 
   return (
     <div className="mx-auto px-4 py-12 sm:px-6 lg:px-8 lg:max-w-9/10">
-      <div className="grid gap-12 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         <div className="flex h-full items-center justify-center">
-          <div className="space-y-6 max-w-80">
+          <div className="space-y-6">
             <div className="flex gap-4 justify-center">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="text-4xl">
@@ -26,7 +26,7 @@ export default async function AboutPage() {
             </div>
 
             {about.description ? (
-              <div className="prose prose-sm text-sm leading-relaxed">
+              <div className="prose prose-sm text-2xl font-bold leading-relaxed">
                 <RichText data={about.description} />
               </div>
             ) : null}
