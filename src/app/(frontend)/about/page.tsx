@@ -1,8 +1,7 @@
 import configPromise from "@payload-config";
 import { getPayload } from "payload";
-import { RichText } from "@payloadcms/richtext-lexical/react";
-
 import { Media } from "@/components/Media";
+import { RichText } from "@/components/RichText";
 
 export default async function AboutPage() {
   const payload = await getPayload({ config: configPromise });
@@ -26,9 +25,10 @@ export default async function AboutPage() {
             </div>
 
             {about.description ? (
-              <div className="prose prose-sm text-2xl font-bold leading-relaxed">
-                <RichText data={about.description} />
-              </div>
+              <RichText
+                data={about.description}
+                className="text-2xl font-bold leading-relaxed"
+              />
             ) : null}
           </div>
         </div>

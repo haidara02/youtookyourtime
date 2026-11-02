@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
   --background: #ffffff;
@@ -26,4 +27,35 @@
     @apply bg-background text-foreground font-sans;
     letter-spacing: 0.1em;
   }
+}
+
+/* Rich text from the CMS editor (Lexical), rendered by src/components/RichText.
+ * The typography plugin supplies structure (headings, lists, quotes, spacing);
+ * these unlayered overrides make it inherit the page's size, weight and
+ * colour so it fits each layout (e.g. the About page's large bold text)
+ * instead of the plugin's grey 16px column. */
+.prose {
+  max-width: none;
+  font-size: inherit;
+  line-height: inherit;
+  --tw-prose-body: currentColor;
+  --tw-prose-headings: currentColor;
+  --tw-prose-bold: currentColor;
+  --tw-prose-links: currentColor;
+  --tw-prose-counters: currentColor;
+  --tw-prose-bullets: currentColor;
+  --tw-prose-quotes: currentColor;
+  --tw-prose-quote-borders: var(--color-brand-red);
+  --tw-prose-hr: currentColor;
+  --tw-prose-th-borders: currentColor;
+  --tw-prose-td-borders: #d4d4d4;
+}
+
+.prose a {
+  text-underline-offset: 0.2em;
+  transition: color 150ms;
+}
+
+.prose a:hover {
+  color: var(--color-brand-red);
 }

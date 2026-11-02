@@ -22,6 +22,7 @@ import { Pages } from "@/collections/Pages";
 import { Users } from "@/collections/Users";
 import { About } from "@/globals/About";
 import { Home } from "@/globals/Home";
+import { ShopSettings } from "@/globals/ShopSettings";
 import { plugins } from "./src/plugins";
 
 const filename = fileURLToPath(import.meta.url);
@@ -43,26 +44,11 @@ export default buildConfig({
         OrderedListFeature(),
         UnorderedListFeature(),
         LinkFeature({
-          enabledCollections: ["pages"],
-          fields: ({ defaultFields }) => {
-            const defaultFieldsWithoutUrl = defaultFields.filter((field) => {
-              if ("name" in field && field.name === "url") return false;
-              return true;
-            });
-
-            return [
-              ...defaultFieldsWithoutUrl,
-              {
-                name: "url",
-                type: "text",
-                admin: {
-                  condition: ({ linkType }) => linkType !== "internal",
-                },
-                label: ({ t }) => t("fields:enterURL"),
-                required: true,
-              },
-            ];
-          },
+          // Internal links: pick a product instead of pasting its URL.
+          // ("pages" has no frontend routes, so links to it went nowhere.)
+          // The default fields are kept as-is: their `url` validation skips
+          // internal links and sanitises unsafe URLs.
+          enabledCollections: ["products"],
         }),
         IndentFeature(),
         EXPERIMENTAL_TableFeature(),
@@ -71,7 +57,7 @@ export default buildConfig({
   }),
   // Define and configure your collections in this array
   collections: [Users, Pages, Categories, Media],
-  globals: [About, Home],
+  globals: [About, Home, ShopSettings],
   db: mongooseAdapter({
     // DATABASE_MONGODB_URI is auto-injected by Vercel's MongoDB Atlas
     // integration in production; DATABASE_URL is used for local dev.

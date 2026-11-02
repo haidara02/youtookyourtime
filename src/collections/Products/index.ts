@@ -17,7 +17,7 @@ import {
   InlineToolbarFeature,
   lexicalEditor,
 } from "@payloadcms/richtext-lexical";
-import { DefaultDocumentIDType, slugField, Where } from "payload";
+import { slugField } from "payload";
 import {
   revalidateProduct,
   revalidateProductDelete,
@@ -29,7 +29,7 @@ export const ProductsCollection: CollectionOverride = ({
   ...defaultCollection,
   admin: {
     ...defaultCollection?.admin,
-    defaultColumns: ["title", "enableVariants", "_status", "variants.variants"],
+    defaultColumns: ["title", "priceInVND", "inventory", "_status"],
     livePreview: {
       url: ({ data, req }) =>
         generatePreviewPath({
@@ -50,9 +50,6 @@ export const ProductsCollection: CollectionOverride = ({
     ...defaultCollection?.defaultPopulate,
     title: true,
     slug: true,
-    variantOptions: true,
-    variants: true,
-    enableVariants: true,
     gallery: true,
     priceInVND: true,
     inventory: true,
@@ -97,52 +94,6 @@ export const ProductsCollection: CollectionOverride = ({
                   type: "upload",
                   relationTo: "media",
                   required: true,
-                },
-                {
-                  name: "variantOption",
-                  type: "relationship",
-                  relationTo: "variantOptions",
-                  admin: {
-                    condition: (data) => {
-                      return (
-                        data?.enableVariants === true &&
-                        data?.variantTypes?.length > 0
-                      );
-                    },
-                  },
-                  filterOptions: ({ data }) => {
-                    if (data?.enableVariants && data?.variantTypes?.length) {
-                      // Populated docs or bare IDs, depending on depth.
-                      const variantTypeIDs = data.variantTypes.map(
-                        (
-                          item:
-                            | DefaultDocumentIDType
-                            | { id: DefaultDocumentIDType },
-                        ) => (typeof item === "object" ? item.id : item),
-                      ) as DefaultDocumentIDType[];
-
-                      if (variantTypeIDs.length === 0)
-                        return {
-                          variantType: {
-                            in: [],
-                          },
-                        };
-
-                      const query: Where = {
-                        variantType: {
-                          in: variantTypeIDs,
-                        },
-                      };
-
-                      return query;
-                    }
-
-                    return {
-                      variantType: {
-                        in: [],
-                      },
-                    };
-                  },
                 },
               ],
             },

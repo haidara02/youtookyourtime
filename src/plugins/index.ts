@@ -10,13 +10,13 @@ import {
 import { ecommercePlugin } from "@payloadcms/plugin-ecommerce";
 import { s3Storage } from "@payloadcms/storage-s3";
 
-// import { stripeAdapter } from "@payloadcms/plugin-ecommerce/payments/stripe";
-
 import { Page, Product } from "@/payload-types";
 import { getServerSideURL } from "@/utilities/getURL";
 import { getMediaPublicURL } from "@/utilities/getMediaURL";
 import { currenciesConfig } from "@/utilities/currencies";
 import { ProductsCollection } from "@/collections/Products";
+import { OrdersCollection } from "@/collections/Orders";
+import { bankTransferAdapter } from "@/payments/bankTransfer";
 import { adminOrPublishedStatus } from "@/access/adminOrPublishedStatus";
 import { adminOnlyFieldAccess } from "@/access/adminOnlyFieldAccess";
 import { customerOnlyFieldAccess } from "@/access/customerOnlyFieldAccess";
@@ -100,45 +100,21 @@ export const plugins: Plugin[] = [
     customers: {
       slug: "users",
     },
-    orders: {
-      ordersCollectionOverride: ({ defaultCollection }) => ({
-        ...defaultCollection,
-        fields: [
-          ...defaultCollection.fields,
-          {
-            name: "accessToken",
-            type: "text",
-            unique: true,
-            index: true,
-            admin: {
-              position: "sidebar",
-              readOnly: true,
-            },
-            hooks: {
-              beforeValidate: [
-                ({ value, operation }) => {
-                  if (operation === "create" || !value) {
-                    return crypto.randomUUID();
-                  }
-                  return value;
-                },
-              ],
-            },
-          },
-        ],
-      }),
+    addresses: {
+      supportedCountries: [{ label: "Vietnam", value: "VN" }],
     },
-    // payments: {
-    //   paymentMethods: [
-    //     stripeAdapter({
-    //       secretKey: process.env.STRIPE_SECRET_KEY!,
-    //       publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
-    //       webhookSecret: process.env.STRIPE_WEBHOOKS_SIGNING_SECRET!,
-    //     }),
-    //   ],
-    // },
+    orders: {
+      ordersCollectionOverride: OrdersCollection,
+    },
+    payments: {
+      // PayOS will be added here (see local/docs/payment/PAYOS-integration.md).
+      paymentMethods: [bankTransferAdapter()],
+    },
     products: {
       productsCollectionOverride: ProductsCollection,
+      // Every piece is one-off (sizing goes in the description), so no
+      // size/colour variants: one product = one sellable item.
+      variants: false,
     },
   }),
   // Cloudflare R2 (S3-compatible) media storage. Falls back to local disk

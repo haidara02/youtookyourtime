@@ -1,89 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
 import { useCart } from "@payloadcms/plugin-ecommerce/client/react";
 
 import { Media } from "@/components/Media";
-import type {
-  Cart,
-  Media as MediaDoc,
-  Product,
-  Variant,
-} from "@/payload-types";
+import type { Cart } from "@/payload-types";
+import { useCartRestoring } from "@/providers/useCartRestoring";
+import { cartHasProblems, toCartLine } from "@/utilities/cartLines";
 import { formatVND } from "@/utilities/formatPrice";
-
-type Line = {
-  id: string;
-  quantity: number;
-  /** null when the product was unpublished/deleted after being added. */
-  product: Product | null;
-  title: string;
-  href?: string;
-  image?: MediaDoc;
-  optionsLabel?: string;
-  unitPrice: number | null;
-  stock: number;
-};
-
-const toLine = (item: NonNullable<Cart["items"]>[number]): Line => {
-  // Relationships the visitor can't read (e.g. an unpublished product) come
-  // back as bare IDs instead of populated docs.
-  const product =
-    item.product && typeof item.product === "object" ? item.product : null;
-  const variant: Variant | null =
-    item.variant && typeof item.variant === "object" ? item.variant : null;
-  const variantRemoved = Boolean(item.variant) && !variant;
-
-  const optionIDs =
-    variant?.options.map((o) => (typeof o === "object" ? o.id : o)) ?? [];
-  const optionsLabel =
-    variant?.options
-      .map((o) => (typeof o === "object" ? o.label : null))
-      .filter(Boolean)
-      .join(" / ") || undefined;
-
-  // Prefer a gallery image tagged with one of this variant's options.
-  const gallery = product?.gallery ?? [];
-  const galleryItem =
-    gallery.find((g) => {
-      const optionID =
-        g.variantOption && typeof g.variantOption === "object"
-          ? g.variantOption.id
-          : g.variantOption;
-      return optionID && optionIDs.includes(optionID);
-    }) ?? gallery[0];
-  const image =
-    galleryItem?.image && typeof galleryItem.image === "object"
-      ? galleryItem.image
-      : undefined;
-
-  const available = Boolean(product) && !variantRemoved;
-
-  return {
-    id: item.id ?? "",
-    quantity: item.quantity,
-    product: available ? product : null,
-    title: product?.title ?? "Unavailable item",
-    href: product?.slug ? `/products/${product.slug}` : undefined,
-    image,
-    optionsLabel,
-    unitPrice: available
-      ? ((variant ? variant.priceInVND : product?.priceInVND) ?? null)
-      : null,
-    stock: available ? ((variant ? variant.inventory : product?.inventory) ?? 0) : 0,
-  };
-};
-
-// The plugin restores a saved cart asynchronously and exposes no "loading"
-// flag for it. It keeps the cart ID in localStorage (removing it if the cart
-// can't be fetched), so "ID stored but no cart yet" means "still restoring".
-// Polled because same-tab localStorage writes don't fire events.
-const subscribeToStoredCart = (onChange: () => void) => {
-  const interval = window.setInterval(onChange, 500);
-  return () => window.clearInterval(interval);
-};
-const hasStoredCart = () => localStorage.getItem("cart") !== null;
 
 export function CartView() {
   const { decrementItem, incrementItem, isLoading, removeItem, ...rest } =
@@ -91,15 +15,11 @@ export function CartView() {
   // Shape set by `cartsFetchQuery` in src/providers/Ecommerce.tsx; undefined
   // until a cart exists.
   const cart = rest.cart as Cart | undefined;
-  const storedCart = useSyncExternalStore(
-    subscribeToStoredCart,
-    hasStoredCart,
-    () => true, // server render: assume there may be a cart to restore
-  );
+  const restoring = useCartRestoring(cart);
 
-  const lines = (cart?.items ?? []).map(toLine);
+  const lines = (cart?.items ?? []).map(toCartLine);
 
-  if (!cart && storedCart) {
+  if (restoring) {
     return (
       <p className="py-24 text-center text-sm text-gray-500">Loading cart…</p>
     );
@@ -123,10 +43,7 @@ export function CartView() {
     (total, line) => total + (line.unitPrice ?? 0) * line.quantity,
     0,
   );
-  const hasProblems = lines.some(
-    (line) =>
-      !line.product || line.unitPrice === null || line.quantity > line.stock,
-  );
+  const hasProblems = cartHasProblems(lines);
 
   return (
     <div className="grid gap-12 lg:grid-cols-3">
@@ -162,11 +79,6 @@ export function CartView() {
                           line.title
                         )}
                       </h3>
-                      {line.optionsLabel ? (
-                        <p className="mt-1 text-sm text-gray-500">
-                          {line.optionsLabel}
-                        </p>
-                      ) : null}
                       <p className="mt-1 text-sm text-gray-400">
                         {formatVND(line.unitPrice) ?? ""}
                       </p>

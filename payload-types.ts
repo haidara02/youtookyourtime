@@ -79,9 +79,6 @@ export interface Config {
     forms: Form;
     'form-submissions': FormSubmission;
     addresses: Address;
-    variants: Variant;
-    variantTypes: VariantType;
-    variantOptions: VariantOption;
     products: Product;
     carts: Cart;
     orders: Order;
@@ -97,12 +94,6 @@ export interface Config {
       cart: 'carts';
       addresses: 'addresses';
     };
-    variantTypes: {
-      options: 'variantOptions';
-    };
-    products: {
-      variants: 'variants';
-    };
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
@@ -112,9 +103,6 @@ export interface Config {
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     addresses: AddressesSelect<false> | AddressesSelect<true>;
-    variants: VariantsSelect<false> | VariantsSelect<true>;
-    variantTypes: VariantTypesSelect<false> | VariantTypesSelect<true>;
-    variantOptions: VariantOptionsSelect<false> | VariantOptionsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     carts: CartsSelect<false> | CartsSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
@@ -131,10 +119,12 @@ export interface Config {
   globals: {
     about: About;
     home: Home;
+    shopSettings: ShopSetting;
   };
   globalsSelect: {
     about: AboutSelect<false> | AboutSelect<true>;
     home: HomeSelect<false> | HomeSelect<true>;
+    shopSettings: ShopSettingsSelect<false> | ShopSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -156,9 +146,6 @@ export interface Config {
       orders: Order;
       products: Product;
       transactions: Transaction;
-      variantOptions: VariantOption;
-      variants: Variant;
-      variantTypes: VariantType;
     };
   };
 }
@@ -232,7 +219,6 @@ export interface Order {
   items?:
     | {
         product?: (string | null) | Product;
-        variant?: (string | null) | Variant;
         quantity: number;
         id?: string | null;
       }[]
@@ -256,7 +242,28 @@ export interface Order {
   status?: OrderStatus;
   amount?: number | null;
   currency?: 'VND' | null;
+  /**
+   * Customers put this in their bank transfer note.
+   */
+  orderCode?: string | null;
+  paymentMethod?: 'bankTransfer' | null;
+  /**
+   * Set to "Paid" once the transfer (with the order code in the note) shows up in the bank account.
+   */
+  paymentStatus?: ('awaiting' | 'paid') | null;
+  /**
+   * If unpaid by then, set Status to Cancelled to release the stock.
+   */
+  paymentDueAt?: string | null;
+  paidAt?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  deliveryMethod?: ('ship' | 'pickup') | null;
+  shippingFee?: number | null;
+  pickupLocation?: string | null;
+  note?: string | null;
   accessToken?: string | null;
+  inventoryRestored?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -285,19 +292,11 @@ export interface Product {
   gallery?:
     | {
         image: string | Media;
-        variantOption?: (string | null) | VariantOption;
         id?: string | null;
       }[]
     | null;
   layout?: MediaBlock[] | null;
   inventory?: number | null;
-  enableVariants?: boolean | null;
-  variantTypes?: (string | VariantType)[] | null;
-  variants?: {
-    docs?: (string | Variant)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
   priceInVNDEnabled?: boolean | null;
   priceInVND?: number | null;
   relatedProducts?: (string | Product)[] | null;
@@ -361,40 +360,6 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantOptions".
- */
-export interface VariantOption {
-  id: string;
-  _variantOptions_options_order?: string | null;
-  variantType: string | VariantType;
-  label: string;
-  /**
-   * should be defaulted or dynamic based on label
-   */
-  value: string;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantTypes".
- */
-export interface VariantType {
-  id: string;
-  label: string;
-  name: string;
-  options?: {
-    docs?: (string | VariantOption)[];
-    hasNextPage?: boolean;
-    totalDocs?: number;
-  };
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
@@ -402,26 +367,6 @@ export interface MediaBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variants".
- */
-export interface Variant {
-  id: string;
-  /**
-   * Used for administrative purposes, not shown to customers. This is populated by default.
-   */
-  title?: string | null;
-  product: string | Product;
-  options: (string | VariantOption)[];
-  inventory?: number | null;
-  priceInVNDEnabled?: boolean | null;
-  priceInVND?: number | null;
-  updatedAt: string;
-  createdAt: string;
-  deletedAt?: string | null;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -447,11 +392,28 @@ export interface Transaction {
   items?:
     | {
         product?: (string | null) | Product;
-        variant?: (string | null) | Variant;
         quantity: number;
         id?: string | null;
       }[]
     | null;
+  paymentMethod?: 'bankTransfer' | null;
+  bankTransfer?: {
+    customerName?: string | null;
+    phone?: string | null;
+    deliveryMethod?: ('ship' | 'pickup') | null;
+    pickupLocation?: string | null;
+    shippingFee?: number | null;
+    shippingAddress?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
+    note?: string | null;
+  };
   billingAddress?: {
     title?: string | null;
     firstName?: string | null;
@@ -484,7 +446,6 @@ export interface Cart {
   items?:
     | {
         product?: (string | null) | Product;
-        variant?: (string | null) | Variant;
         quantity: number;
         id?: string | null;
       }[]
@@ -514,47 +475,7 @@ export interface Address {
   city?: string | null;
   state?: string | null;
   postalCode?: string | null;
-  country:
-    | 'US'
-    | 'GB'
-    | 'CA'
-    | 'AU'
-    | 'AT'
-    | 'BE'
-    | 'BR'
-    | 'BG'
-    | 'CY'
-    | 'CZ'
-    | 'DK'
-    | 'EE'
-    | 'FI'
-    | 'FR'
-    | 'DE'
-    | 'GR'
-    | 'HK'
-    | 'HU'
-    | 'IN'
-    | 'IE'
-    | 'IT'
-    | 'JP'
-    | 'LV'
-    | 'LT'
-    | 'LU'
-    | 'MY'
-    | 'MT'
-    | 'MX'
-    | 'NL'
-    | 'NZ'
-    | 'NO'
-    | 'PL'
-    | 'PT'
-    | 'RO'
-    | 'SG'
-    | 'SK'
-    | 'SI'
-    | 'ES'
-    | 'SE'
-    | 'CH';
+  country: 'VN';
   phone?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -809,18 +730,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'addresses';
         value: string | Address;
-      } | null)
-    | ({
-        relationTo: 'variants';
-        value: string | Variant;
-      } | null)
-    | ({
-        relationTo: 'variantTypes';
-        value: string | VariantType;
-      } | null)
-    | ({
-        relationTo: 'variantOptions';
-        value: string | VariantOption;
       } | null)
     | ({
         relationTo: 'products';
@@ -1124,47 +1033,6 @@ export interface AddressesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variants_select".
- */
-export interface VariantsSelect<T extends boolean = true> {
-  title?: T;
-  product?: T;
-  options?: T;
-  inventory?: T;
-  priceInVNDEnabled?: T;
-  priceInVND?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-  _status?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantTypes_select".
- */
-export interface VariantTypesSelect<T extends boolean = true> {
-  label?: T;
-  name?: T;
-  options?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "variantOptions_select".
- */
-export interface VariantOptionsSelect<T extends boolean = true> {
-  _variantOptions_options_order?: T;
-  variantType?: T;
-  label?: T;
-  value?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  deletedAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products_select".
  */
 export interface ProductsSelect<T extends boolean = true> {
@@ -1174,7 +1042,6 @@ export interface ProductsSelect<T extends boolean = true> {
     | T
     | {
         image?: T;
-        variantOption?: T;
         id?: T;
       };
   layout?:
@@ -1183,9 +1050,6 @@ export interface ProductsSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
       };
   inventory?: T;
-  enableVariants?: T;
-  variantTypes?: T;
-  variants?: T;
   priceInVNDEnabled?: T;
   priceInVND?: T;
   relatedProducts?: T;
@@ -1222,7 +1086,6 @@ export interface CartsSelect<T extends boolean = true> {
     | T
     | {
         product?: T;
-        variant?: T;
         quantity?: T;
         id?: T;
       };
@@ -1244,7 +1107,6 @@ export interface OrdersSelect<T extends boolean = true> {
     | T
     | {
         product?: T;
-        variant?: T;
         quantity?: T;
         id?: T;
       };
@@ -1269,7 +1131,19 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   amount?: T;
   currency?: T;
+  orderCode?: T;
+  paymentMethod?: T;
+  paymentStatus?: T;
+  paymentDueAt?: T;
+  paidAt?: T;
+  customerName?: T;
+  customerPhone?: T;
+  deliveryMethod?: T;
+  shippingFee?: T;
+  pickupLocation?: T;
+  note?: T;
   accessToken?: T;
+  inventoryRestored?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1282,9 +1156,20 @@ export interface TransactionsSelect<T extends boolean = true> {
     | T
     | {
         product?: T;
-        variant?: T;
         quantity?: T;
         id?: T;
+      };
+  paymentMethod?: T;
+  bankTransfer?:
+    | T
+    | {
+        customerName?: T;
+        phone?: T;
+        deliveryMethod?: T;
+        pickupLocation?: T;
+        shippingFee?: T;
+        shippingAddress?: T;
+        note?: T;
       };
   billingAddress?:
     | T
@@ -1389,6 +1274,43 @@ export interface Home {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings".
+ */
+export interface ShopSetting {
+  id: string;
+  /**
+   * e.g. Vietcombank
+   */
+  bankName?: string | null;
+  /**
+   * The bank's 6-digit NAPAS code, needed for the QR code (e.g. Vietcombank 970436, Techcombank 970407, MB 970422, ACB 970416). Check it against your bank before going live.
+   */
+  bankBin?: string | null;
+  accountNumber?: string | null;
+  /**
+   * Account holder name exactly as the bank shows it, e.g. NGUYEN VAN A
+   */
+  accountName?: string | null;
+  /**
+   * Shown to customers as the deadline to pay. Stock stays reserved until the order is cancelled.
+   */
+  paymentWindowHours?: number | null;
+  shippingFee?: number | null;
+  /**
+   * Leave empty to hide the in-store pickup option at checkout.
+   */
+  pickupLocations?:
+    | {
+        name: string;
+        address: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "about_select".
  */
 export interface AboutSelect<T extends boolean = true> {
@@ -1405,6 +1327,28 @@ export interface AboutSelect<T extends boolean = true> {
 export interface HomeSelect<T extends boolean = true> {
   heroVideo1?: T;
   heroVideo2?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shopSettings_select".
+ */
+export interface ShopSettingsSelect<T extends boolean = true> {
+  bankName?: T;
+  bankBin?: T;
+  accountNumber?: T;
+  accountName?: T;
+  paymentWindowHours?: T;
+  shippingFee?: T;
+  pickupLocations?:
+    | T
+    | {
+        name?: T;
+        address?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

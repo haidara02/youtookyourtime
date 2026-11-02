@@ -3,13 +3,13 @@
 import { EcommerceProvider } from "@payloadcms/plugin-ecommerce/client/react";
 import type { ReactNode } from "react";
 
+import { bankTransferClient } from "@/payments/bankTransfer/client";
 import { currenciesConfig } from "@/utilities/currencies";
 
 /**
  * What every cart fetch includes, beyond the plugin's default of bare IDs and
- * prices: enough for the cart page to render lines (title, link, image,
- * option labels) and cap quantities at stock. Depth 2 reaches the gallery's
- * media docs and the variants' option docs.
+ * prices: enough for the cart page to render lines (title, link, image)
+ * and cap quantities at stock. Depth 2 reaches the gallery's media docs.
  */
 const cartsFetchQuery = {
   depth: 2,
@@ -18,11 +18,6 @@ const cartsFetchQuery = {
       title: true,
       slug: true,
       gallery: true,
-      inventory: true,
-      priceInVND: true,
-    },
-    variants: {
-      options: true,
       inventory: true,
       priceInVND: true,
     },
@@ -39,6 +34,7 @@ export function Ecommerce({ children }: { children: ReactNode }) {
     <EcommerceProvider
       currenciesConfig={currenciesConfig}
       api={{ cartsFetchQuery }}
+      paymentMethods={[bankTransferClient]}
     >
       {children}
     </EcommerceProvider>
